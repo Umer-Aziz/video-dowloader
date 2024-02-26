@@ -24,6 +24,7 @@ export default function Home() {
       const response = await fetch(url, options);
       const result = await response.json();
       setVideoData(result);
+      console.log("data ", result)
       
     } catch (error) {
       console.error(error);
@@ -50,6 +51,9 @@ export default function Home() {
                     type="text"
                     placeholder="Paste your video link here"
                     value={videoUrl}
+                    required
+                    minLength={10}
+                    title='Please enter a valid URL'
                     onChange={(e) => setVideoUrl(e.target.value)}
                   />
                 </div>
@@ -67,7 +71,7 @@ export default function Home() {
                   videoData.picture && (
                     <div className="relative w-full max-w-80">
                       <Image
-                        className="rounded w-full"
+                        className="rounded w-full  bg-contain"
                         priority
                         layout="responsive"
                         width={300}
@@ -80,15 +84,23 @@ export default function Home() {
                 <div>
                   {/* Display fetched video data */}
                   { videoData.title && <h3 className="font-medium">{videoData.title}</h3>}
-                  { videoData.author && (
+                  {( videoData.author && !videoData.author.avatar )&& (
                     <h4 className="text-xs font-medium mt-0.5">
                       <span className="text-cyan-600">Channel: </span> {videoData.author}
                     </h4>
                   )}
-                  { videoData.durationText && (
+                  {
+                    (videoData.author && videoData.author.avatar) && <div className='mt-4'>
+                      <Image className='rounded-full bg-contain' alt={videoData?.title} width={48} height={48} src={videoData.author.avatar} />
+                    </div>
+                  }
+                  { videoData.duration && (
                     <h6 className="mt-2 md:mt-4 text-sm">
                       <span className="text-cyan-600">Duration: </span>
-                      <span>{videoData.durationText}</span>
+                      <span>
+            {Math.floor(videoData.duration / 60).toString().padStart(2, '0')}:
+            {Math.floor(videoData.duration % 60).toString().padStart(2, '0')}s
+          </span>
                     </h6>
                   )}
                   { videoData.publishedText && (
@@ -100,7 +112,7 @@ export default function Home() {
                   <div className="mt-4 md:mt-6 lg:mt-8 flex gap-4 items-center">
                     {/* SD Download button */}
                     { videoData.links && videoData.links.map(link => (
-                      link.quality === 'sd_360p' && (
+                      (link.quality === 'sd_360p' || link.quality ==="sd") && (
                         <a
                           key={link.quality}
                           href={link.link}
@@ -113,7 +125,7 @@ export default function Home() {
                     ))}
                     {/* HD Download button */}
                     { videoData.links && videoData.links.map(link => (
-                      link.quality === 'hd_720p' && (
+                      (link.quality === 'hd_720p' || link.quality === "hd") && (
                         <a
                           key={link.quality}
                           href={link.link}
@@ -126,6 +138,9 @@ export default function Home() {
                     ))}
                   </div>
                 </div>
+                {(videoData && videoData.success === false )&& <div className='w-full'>
+                  <h6 className='text-sm font-medium text-red-500 text-center'>Sorry , your Link is not Valid or your video is from private channel or profile..</h6>
+                </div>}
               </div>
             )}
           </div>
