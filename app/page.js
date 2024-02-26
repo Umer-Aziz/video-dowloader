@@ -24,7 +24,7 @@ export default function Home() {
       const response = await fetch(url, options);
       const result = await response.json();
       setVideoData(result);
-      console.log("data ", result)
+      // console.log("data ", result)
       
     } catch (error) {
       console.error(error);
